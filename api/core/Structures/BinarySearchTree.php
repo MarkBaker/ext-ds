@@ -1,154 +1,170 @@
 <?php
-namespace Ds\Structures;
 
-use Ds\Interfaces\Collection;
+// BINARY SEARCH TREE CAN BE AN INTERNAL ONLY STRUCTURE,
+// USED BY A SORTED SET, AND POTENTIALLY SORTED MAP AS WELL.
+//
+// NODE WOULD NEED TO BE:
+// struct ds_bst_node {
+//     zval key;            We could make an assumption that we're always using
+//                          the first member of the struct as the key.
+//
+//                          The colour would also be stored in the u2.next of the key.
+//     zval value;
+//     ds_bst_node_t *lt;
+//     ds_bst_node_t *gt;
+// }
+//
 
-use function Ds\is_equal;
-use Traversable;
+// namespace Ds\Structures;
 
-final class BinarySearchTree implements Collection
-{
-    /**
-     * @internal
-     */
-    private $array = [];
+// use Ds\Interfaces\Collection;
 
-    /**
-     * @internal
-     */
-    private $sorted = true;
+// use function Ds\is_equal;
+// use Traversable;
 
-    /**
-     * Binary search to emulate a binary search tree. It's important
-     * to use a comparison-based algorithm here so that the PHP
-     * implementation can be consistent with the extension.
-     *
-     * @internal
-     */
-    private function search($value)
-    {
-        $this->sort();
+// final class BinarySearchTree implements Collection
+// {
+//     /**
+//      * @internal
+//      */
+//     private $array = [];
 
-        // Converging indices.
-        $x = 0;
-        $y = $this->count();
+//     /**
+//      * @internal
+//      */
+//     private $sorted = true;
 
-        while ($x < $y) {
+//     /**
+//      * Binary search to emulate a binary search tree. It's important
+//      * to use a comparison-based algorithm here so that the PHP
+//      * implementation can be consistent with the extension.
+//      *
+//      * @internal
+//      */
+//     private function search($value)
+//     {
+//         $this->sort();
 
-            // Find the midpoint to determine a candidate.
-            $m = $x / 2 + $y / 2;
+//         // Converging indices.
+//         $x = 0;
+//         $y = $this->count();
 
-            // Check to see if we have found the value.
-            if (is_equal($this->array[$m], $value)) {
-                return $m;
-            }
+//         while ($x < $y) {
 
-            // Continue searching...
-            if ($value > $this->array[$m]) {
-                $x = $m + 1;
-            } else {
-                $y = $m - 1;
-            }
-        }
-    }
+//             // Find the midpoint to determine a candidate.
+//             $m = $x / 2 + $y / 2;
 
-    /**
-     *
-     */
-    public function add($value): bool
-    {
-        $index = $this->search($value);
+//             // Check to see if we have found the value.
+//             if (is_equal($this->array[$m], $value)) {
+//                 return $m;
+//             }
 
-        // Can't add the same value twice.
-        if (isset($index)) {
-            return false;
-        }
+//             // Continue searching...
+//             if ($value > $this->array[$m]) {
+//                 $x = $m + 1;
+//             } else {
+//                 $y = $m - 1;
+//             }
+//         }
+//     }
 
-        // Add but don't sort because we might add more.
-        $this->array[] = $value;
-        $this->sorted  = false;
+//     /**
+//      *
+//      */
+//     public function add($value): bool
+//     {
+//         $index = $this->search($value);
 
-        return true;
-    }
+//         // Can't add the same value twice.
+//         if (isset($index)) {
+//             return false;
+//         }
 
-    /**
-     *
-     */
-    public function remove($value): bool
-    {
-        $index = $this->search($value);
-        $found = isset($index);
+//         // Add but don't sort because we might add more.
+//         $this->array[] = $value;
+//         $this->sorted  = false;
 
-        // Lift the value from the array if found.
-        if ($found) {
-            array_splice($this->array, $index, 1);
-        }
+//         return true;
+//     }
 
-        return $found;
-    }
+//     /**
+//      *
+//      */
+//     public function remove($value): bool
+//     {
+//         $index = $this->search($value);
+//         $found = isset($index);
 
-    /**
-     *
-     */
-    public function has($value): bool
-    {
-        return !is_null($this->search($value));
-    }
+//         // Lift the value from the array if found.
+//         if ($found) {
+//             array_splice($this->array, $index, 1);
+//         }
 
-    /**
-     * @internal ensures that the internal array is sorted.
-     */
-    private function sort()
-    {
-        if ($this->sorted) {
-            return;
-        }
+//         return $found;
+//     }
 
-        sort($this->array);
+//     /**
+//      *
+//      */
+//     public function has($value): bool
+//     {
+//         return !is_null($this->search($value));
+//     }
 
-        $this->sorted = true;
-    }
+//     /**
+//      * @internal ensures that the internal array is sorted.
+//      */
+//     private function sort()
+//     {
+//         if ($this->sorted) {
+//             return;
+//         }
 
-    /**
-     * @return array The values of this structure as an array.
-     */
-    public function toArray(): array
-    {
-        $this->sort();
+//         sort($this->array);
 
-        return $this->array;
-    }
+//         $this->sorted = true;
+//     }
 
-    /**
-     * Clears or resets the collection to an initial state.
-     */
-    public function clear()
-    {
-        $this->array = [];
-        $this->sorted = true;
-    }
+//     /**
+//      * @return array The values of this structure as an array.
+//      */
+//     public function toArray(): array
+//     {
+//         $this->sort();
 
-    /**
-     *
-     */
-    public function count()
-    {
-        return count($this->array);
-    }
+//         return $this->array;
+//     }
 
-    /**
-     * @return bool TRUE if this collection is empty, FALSE otherwise.
-     */
-    public function isEmpty(): bool
-    {
-        return empty($this->array);
-    }
+//     /**
+//      * Clears or resets the collection to an initial state.
+//      */
+//     public function clear()
+//     {
+//         $this->array = [];
+//         $this->sorted = true;
+//     }
 
-    /**
-     *
-     */
-    public function getIterator()
-    {
-        yield from $this->toArray();
-    }
-}
+//     /**
+//      *
+//      */
+//     public function count()
+//     {
+//         return count($this->array);
+//     }
+
+//     /**
+//      * @return bool TRUE if this collection is empty, FALSE otherwise.
+//      */
+//     public function isEmpty(): bool
+//     {
+//         return empty($this->array);
+//     }
+
+//     /**
+//      *
+//      */
+//     public function getIterator()
+//     {
+//         yield from $this->toArray();
+//     }
+// }
